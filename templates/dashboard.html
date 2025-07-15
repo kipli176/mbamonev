@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SiMonev - Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-image: url('/static/images/bg_simonev.webp');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-fixed overflow-x-hidden">
+
+<!-- Overlay -->
+<div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden"></div>
+
+<!-- Header -->
+<header class="flex items-center justify-between px-4 py-3 bg-white/90 backdrop-blur border-b border-gray-200 fixed top-0 left-0 right-0 z-40">
+    <div class="flex items-center space-x-3">
+      <button id="sidebar-toggle" class="text-[#0D47A1]">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2"
+             viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+      <div class="flex items-center space-x-1">
+        <span class="text-[#0D47A1] font-semibold text-xl">SI</span>
+        <span class="text-[#2f9e7f] font-semibold text-xl">MONEV</span>
+      </div>
+    </div>
+    <div class="text-xs text-right text-[#6b7a99]">
+      <div class="font-semibold">MEIKE KUSMAWANTI, S.Si.</div>
+      <div>Pimpinan PT Universitas Jenderal Soedirman</div>
+    </div>
+  </header>
+<!-- Sidebar -->
+<aside id="sidebar"
+class="bg-white/90 backdrop-blur w-[300px] h-screen overflow-y-auto
+fixed top-0 left-0 z-30 pt-20
+       transform transition-transform duration-300 ease-in-out
+       -translate-x-full sidebar transition-sidebar
+       border-r border-gray-200 flex flex-col justify-between">
+
+
+<!-- Header Sidebar -->
+<div>
+<div class="flex flex-col items-center">
+<img src="/static/images/logo_simonev.png"
+    alt="Logo SiMonev" class="w-16 h-16 mb-2" />
+<h3 class="text-center font-semibold text-sm text-[#0D47A1]">Monitoring & Evaluasi</h3>
+<p class="text-center text-[11px] text-[#2f9e7f] font-medium mb-4">Universitas Jenderal Soedirman</p>
+</div>
+
+        {% set grup_map = { 
+            "User Management": "Modul Global",
+            "Manajemen Unit Kerja": "Modul Global",
+            "Manajemen Tahun Anggaran": "Modul Global",
+         
+            "Import Data PAGU": "Modul Anggaran",
+            "Import Realisasi RM/BOPTN": "Modul Anggaran",
+            "Sinkronisasi Realisasi BLU": "Modul Anggaran",
+            "Dashboard Realisasi Detail": "Modul Anggaran",
+            "Dashboard Realisasi Global": "Modul Anggaran",
+            "Dashboard Realisasi Universitas": "Modul Anggaran",
+            "Lihat Data Realisasi Detail": "Modul Anggaran",
+            "Monev Anggaran": "Modul Anggaran",
+            "Laporan Capaian Anggaran Unit": "Modul Anggaran",
+            "Laporan Capaian Anggaran Univ": "Modul Anggaran",
+            "Realisasi Detail Internal": "Modul Anggaran",
+            "Realisasi Detail Universitas": "Modul Anggaran",
+            "Export Realisasi PDF": "Modul Anggaran",
+            "Export Realisasi Excel": "Modul Anggaran",
+         
+            "Import Kontrak Kinerja": "Modul IKU",
+            "Import Kontrak Kinerja Unit": "Modul IKU",
+            "Import Kontrak Kinerja Univ": "Modul IKU",
+            "Import Data IKU 1–7": "Modul IKU",
+            "Tabel Pendukung IKU": "Modul IKU",
+            "Tabel Mahasiswa": "Modul IKU",
+            "Tabel Dosen": "Modul IKU",
+            "Tabel Prodi": "Modul IKU",
+            "Tabel Prestasi": "Modul IKU",
+            "Manajemen Capaian NON IKU": "Modul IKU",
+            "Capaian NON IKU Unit": "Modul IKU",
+            "Capaian NON IKU Univ": "Modul IKU",
+            "Tabel Pendukung NON IKU": "Modul IKU",
+            "Dashboard Capaian IKU": "Modul IKU",
+            "Unit": "Modul IKU",
+            "Universitas": "Modul IKU",
+            "Publik": "Modul IKU",
+            "IKU Per Indikator": "Modul IKU",
+            "Tracer Study": "Modul IKU",
+            "Akadmas": "Modul IKU",
+            "SIA": "Modul IKU",
+            "SISTER": "Modul IKU",
+            "SINTA": "Modul IKU",
+            "SIKERMA": "Modul IKU",
+            "Lainnya": "Modul IKU",
+            "Export IKU": "Modul IKU",
+            "Export PDF": "Modul IKU",
+            "Export Excel": "Modul IKU"
+        }
+         %}
+          {% set ordered_groups = ['Modul Global', 'Modul Anggaran', 'Modul IKU', 'Lainnya'] %}
+          {% set grouped = {} %}
+          
+          {# Organize menu into groups #}
+          {% for item in menu %}
+            {% set gname = grup_map.get(item.parent.nama_modul, 'Lainnya') %}
+            {% set _ = grouped.setdefault(gname, []).append(item) %}
+          {% endfor %}
+          
+          <nav class="px-3 text-[12px] text-[#0D47A1] font-medium">
+            <ul class="space-y-2">
+              {% for grup in ordered_groups %}
+                {% if grouped.get(grup) %}
+                  <li class="mt-3 mb-1 text-[11px] font-bold text-[#6b7a99] uppercase tracking-wide">{{ grup }}</li>
+          
+                  {% for item in grouped[grup] %}
+                    {% if item.children %}
+                      <li>
+                        <button type="button"
+                                class="w-full flex items-center justify-between px-3 py-2 rounded-md hover:bg-[#0D47A1] hover:text-white transition
+                                        {% if request.path.startswith(item.parent.path) %} bg-[#0D47A1] text-white {% endif %}"
+                                data-collapse-toggle="submenu-{{ item.parent.id }}">
+                          <span class="flex items-center gap-2">
+                            {{ item.parent.ikon or '📁' }}
+                            {{ item.parent.nama_modul }}
+                          </span>
+                          <svg class="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+                        <ul id="submenu-{{ item.parent.id }}" class="hidden space-y-1 mt-1 ml-4 text-[13px]">
+                          {% for sub in item.children %}
+                            <li>
+                              <a href="{{ sub.path }}"
+                                 class="block px-3 py-1 rounded hover:bg-[#0D47A1] hover:text-white
+                                        {% if request.path.startswith(sub.path) %} text-white bg-[#0D47A1] {% endif %}">
+                                {{ sub.nama_modul }}
+                              </a>
+                            </li>
+                          {% endfor %}
+                        </ul>
+                      </li>
+                    {% else %}
+                      <li>
+                        <a href="{{ item.parent.path }}"
+                           class="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-[#0D47A1] hover:text-white transition
+                                  {% if request.path.startswith(item.parent.path) %} bg-[#0D47A1] text-white {% endif %}">
+                          {{ item.parent.ikon or '📄' }}
+                          {{ item.parent.nama_modul }}
+                        </a>
+                      </li>
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+          
+              <!-- Logout -->
+              <li class="mt-3 border-t pt-3 border-slate-200">
+                <a href="{{ url_for('auth.logout') }}"
+                   class="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-red-600 hover:text-white text-red-700 transition font-semibold">
+                  🔓 Logout
+                </a>
+              </li>
+            </ul>
+          </nav>
+          
+    </div>
+
+  <!-- Footer -->
+  <footer class="text-center text-[10px] text-slate-500 px-4 py-2 select-none">
+    {{ now().year if now else "2025" }} – SiMonev Unsoed<br>
+    Direktorat Sistem Informasi
+  </footer>
+</aside>
+
+<!-- Main -->
+<main id="main-content" class="transition-all duration-300 ease-in-out pt-[85px] p-6 md:pl-[310px]">
+  <nav class="text-xs text-[#6b7a99] mb-4">
+    <ul class="flex space-x-2">
+      <li><a href="#" class="hover:underline">Home</a></li>
+      <li>/</li>
+      <li><a href="#" class="hover:underline">Pencapaian PTN</a></li>
+      <li>/</li>
+      <li><a href="#" class="hover:underline">Per PT</a></li>
+    </ul>
+  </nav>
+  <h1 class="text-[#0D47A1] font-semibold text-lg mb-2">Capaian IKU Universitas Jenderal Soedirman</h1>
+  <section class="text-sm text-[#333] leading-relaxed space-y-4 bg-white/70 backdrop-blur-sm rounded-md p-4 shadow">
+    <p>Indikator Kinerja Utama (IKU) merupakan instrumen utama dalam mengukur kualitas dan capaian perguruan tinggi dalam berbagai aspek.</p>
+    <p>Data yang ditampilkan dalam dashboard ini mencerminkan performa berdasarkan unit pelaksana, indikator prioritas, serta distribusi pencapaian secara berkala.</p>
+  </section>
+</main>
+<!-- Script -->
+<script>
+    const body = document.body;
+    const sidebar = document.getElementById("sidebar");
+    const mainContent = document.getElementById("main-content");
+    const overlay = document.getElementById("overlay");
+    const toggle = document.getElementById("sidebar-toggle");
+  
+    // Buka atau tutup sidebar
+    function setSidebarState(open) {
+      if (open) {
+        sidebar.classList.remove("-translate-x-full");
+        overlay.classList.remove("hidden");
+        mainContent.classList.add("md:pl-[310px]");
+        body.classList.add("sidebar-open");
+        body.classList.remove("sidebar-closed");
+        localStorage.setItem("sidebar", "open");
+      } else {
+        sidebar.classList.add("-translate-x-full");
+        overlay.classList.add("hidden");
+        mainContent.classList.remove("md:pl-[310px]");
+        body.classList.remove("sidebar-open");
+        body.classList.add("sidebar-closed");
+        localStorage.setItem("sidebar", "closed");
+      }
+    }
+  
+    // Toggle saat tombol diklik
+    toggle.addEventListener("click", () => {
+      const isClosed = sidebar.classList.contains("-translate-x-full");
+      setSidebarState(isClosed);
+    });
+  
+    // Klik overlay = tutup
+    overlay.addEventListener("click", () => setSidebarState(false));
+  
+    // Collapse submenu toggle
+    document.querySelectorAll('[data-collapse-toggle]').forEach(button => {
+      button.addEventListener("click", () => {
+        const target = document.getElementById(button.getAttribute("data-collapse-toggle"));
+        target.classList.toggle("hidden");
+      });
+    });
+  
+    // ⏪ Set sidebar state saat load
+    window.addEventListener("DOMContentLoaded", () => {
+      const savedState = localStorage.getItem("sidebar");
+      const isMobile = window.innerWidth < 768;
+  
+      if (savedState === "closed" || isMobile) {
+        setSidebarState(false);
+      } else {
+        setSidebarState(true);
+      }
+    });
+  </script>
+  
+  
+  
+  </body>
+  </html>
