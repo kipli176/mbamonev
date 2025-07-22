@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>🌍 Dashboard Realisasi Global</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    html, body {
+      margin: 0; padding: 0;
+      height: 100%; font-family: sans-serif;
+      background-color: #f5f5f5;
+      overflow: hidden;
+    }
+    .container {
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      height: 100vh; gap: 10px;
+      padding: 10px 20px; box-sizing: border-box;
+    }
+    .filters {
+      display: flex; gap: 10px; flex-wrap: wrap;
+    }
+    select {
+      padding: 6px; border-radius: 4px; font-size: 14px;
+      border: 1px solid #ccc;
+    }
+    .cards {
+      display: flex; gap: 15px; flex-wrap: wrap;
+    }
+    .card {
+      background: white; padding: 12px 16px;
+      border-radius: 8px; flex: 1; min-width: 160px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    .charts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .chart-box {
+      background: white; padding: 10px;
+      border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      max-height: 300px;
+    }
+    .table-container {
+      background: white; overflow: auto;
+      border-radius: 6px; height: 220px;
+    }
+    table {
+      width: 100%; border-collapse: collapse; font-size: 13px;
+    }
+    th, td {
+      padding: 8px; border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+    th { background: #f0f0f0; }
+    .actions { text-align: right; margin-top: 5px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- FILTERS -->
+    <div class="filters">
+      <select><option>Tahun</option><option>2025</option></select>
+      <select><option>Jenis Dana</option><option>BOPTN</option><option>BLU</option><option>SBSN</option></select>
+      <select><option>Jenis Data</option><option>Realisasi</option><option>Pagu</option></select>
+      <select><option>Unit</option><option>Semua Unit</option><option>Fakultas Teknik</option></select>
+    </div>
+
+    <!-- KPI CARDS -->
+    <div class="cards">
+      <div class="card"><h4>Total Pagu</h4><p>Rp 20.000.000.000</p></div>
+      <div class="card"><h4>Total Realisasi</h4><p>Rp 16.750.000.000</p></div>
+      <div class="card"><h4>Serapan (%)</h4><p>83.75%</p></div>
+      <div class="card"><h4>Unit Tertinggi</h4><p>Fakultas Teknik (4,2 M)</p></div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="charts">
+      <div class="chart-box">
+        <h5>🔍 Pagu vs Realisasi per Unit</h5>
+        <canvas id="chartUnit"></canvas>
+      </div>
+      <div class="chart-box">
+        <h5>📊 Realisasi per Jenis Dana</h5>
+        <canvas id="chartDana"></canvas>
+      </div>
+      <div class="chart-box">
+        <h5>✅ Tingkat Serapan per Unit</h5>
+        <canvas id="chartSerapan"></canvas>
+      </div>
+    </div>
+
+    <!-- TABEL -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Unit</th>
+            <th>Jenis Dana</th>
+            <th>Pagu (Rp)</th>
+            <th>Realisasi (Rp)</th>
+            <th>Selisih</th>
+            <th>Serapan (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Fakultas Teknik</td>
+            <td>BOPTN</td>
+            <td>5.000.000.000</td>
+            <td>4.200.000.000</td>
+            <td>800.000.000</td>
+            <td>84%</td>
+          </tr>
+          <tr>
+            <td>Fakultas Ekonomi</td>
+            <td>BLU</td>
+            <td>3.500.000.000</td>
+            <td>2.900.000.000</td>
+            <td>600.000.000</td>
+            <td>82.86%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="actions">
+      <button>⬇ Export Excel</button>
+    </div>
+  </div>
+
+  <!-- JS Chart Config -->
+  <script>
+    // Bar: Pagu vs Realisasi
+    new Chart(document.getElementById('chartUnit'), {
+      type: 'bar',
+      data: {
+        labels: ['Teknik', 'Ekonomi', 'Kedokteran'],
+        datasets: [
+          {
+            label: 'Pagu',
+            data: [5000000000, 3500000000, 4500000000],
+            backgroundColor: '#90caf9'
+          },
+          {
+            label: 'Realisasi',
+            data: [4200000000, 2900000000, 4000000000],
+            backgroundColor: '#42a5f5'
+          }
+        ]
+      }
+    });
+
+    // Donut: Realisasi per Jenis Dana
+    new Chart(document.getElementById('chartDana'), {
+      type: 'doughnut',
+      data: {
+        labels: ['BOPTN', 'BLU', 'SBSN'],
+        datasets: [{
+          data: [8000000000, 6000000000, 2750000000],
+          backgroundColor: ['#4caf50', '#ff9800', '#9c27b0']
+        }]
+      }
+    });
+
+    // Horizontal Bar: Serapan
+    new Chart(document.getElementById('chartSerapan'), {
+      type: 'bar',
+      data: {
+        labels: ['Teknik', 'Ekonomi', 'Kedokteran'],
+        datasets: [{
+          label: 'Serapan (%)',
+          data: [84, 82.86, 88.89],
+          backgroundColor: '#66bb6a'
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        scales: {
+          x: { min: 0, max: 100 }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>🏫 Dashboard Realisasi Universitas</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    html, body {
+      margin: 0; padding: 0;
+      height: 100%;
+      font-family: sans-serif;
+      background-color: #f5f5f5;
+      overflow: hidden;
+    }
+    .container {
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      height: 100vh; gap: 10px;
+      padding: 10px 20px;
+      box-sizing: border-box;
+    }
+    .filters {
+      display: flex; gap: 10px; flex-wrap: wrap;
+    }
+    select {
+      padding: 6px; border-radius: 4px;
+      font-size: 14px; border: 1px solid #ccc;
+    }
+    .cards {
+      display: flex; gap: 15px; flex-wrap: wrap;
+    }
+    .card {
+      background: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      flex: 1;
+      min-width: 160px;
+    }
+    .charts {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 10px;
+    }
+    .chart-box {
+      background: white;
+      padding: 10px;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      max-height: 300px;
+    }
+    .table-container {
+      background: white;
+      overflow: auto;
+      border-radius: 6px;
+      height: 220px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+    th {
+      background: #f0f0f0;
+    }
+    .actions {
+      text-align: right;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- FILTER -->
+    <div class="filters">
+      <select><option>Tahun</option><option>2025</option></select>
+      <select><option>Jenis Dana</option><option>Semua</option><option>BOPTN</option><option>BLU</option></select>
+      <select><option>Triwulan</option><option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option></select>
+    </div>
+
+    <!-- KPI CARDS -->
+    <div class="cards">
+      <div class="card"><h4>Total Pagu Universitas</h4><p>Rp 100.000.000.000</p></div>
+      <div class="card"><h4>Total Realisasi</h4><p>Rp 84.500.000.000</p></div>
+      <div class="card"><h4>Serapan (%)</h4><p>84.5%</p></div>
+      <div class="card"><h4>Target Nasional</h4><p>90%</p></div>
+      <div class="card"><h4>Deviasi</h4><p>−5.5%</p></div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="charts">
+      <div class="chart-box">
+        <h5>📈 Tren Realisasi Bulanan</h5>
+        <canvas id="chartTrend"></canvas>
+      </div>
+      <div class="chart-box">
+        <h5>📊 Distribusi Jenis Dana</h5>
+        <canvas id="chartDana"></canvas>
+      </div>
+    </div>
+
+    <!-- TABEL -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Jenis Dana</th>
+            <th>Pagu (Rp)</th>
+            <th>Realisasi (Rp)</th>
+            <th>Serapan (%)</th>
+            <th>Target (%)</th>
+            <th>Deviasi (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>BOPTN</td>
+            <td>50.000.000.000</td>
+            <td>43.000.000.000</td>
+            <td>86%</td>
+            <td>90%</td>
+            <td>−4%</td>
+          </tr>
+          <tr>
+            <td>BLU</td>
+            <td>35.000.000.000</td>
+            <td>28.500.000.000</td>
+            <td>81.43%</td>
+            <td>90%</td>
+            <td>−8.57%</td>
+          </tr>
+          <tr>
+            <td>SBSN</td>
+            <td>15.000.000.000</td>
+            <td>13.000.000.000</td>
+            <td>86.67%</td>
+            <td>90%</td>
+            <td>−3.33%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="actions">
+      <button>⬇ Export Excel</button>
+    </div>
+  </div>
+
+  <!-- CHART JS CONFIG -->
+  <script>
+    // Tren Bulanan Realisasi
+    new Chart(document.getElementById('chartTrend'), {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul'],
+        datasets: [{
+          label: 'Realisasi (Rp)',
+          data: [5000000000, 7000000000, 9000000000, 12000000000, 15000000000, 19000000000, 22000000000],
+          fill: true,
+          backgroundColor: 'rgba(66, 165, 245, 0.2)',
+          borderColor: '#2196f3',
+          tension: 0.3
+        }]
+      }
+    });
+
+    // Distribusi Jenis Dana
+    new Chart(document.getElementById('chartDana'), {
+      type: 'pie',
+      data: {
+        labels: ['BOPTN', 'BLU', 'SBSN'],
+        datasets: [{
+          data: [43000000000, 28500000000, 13000000000],
+          backgroundColor: ['#4caf50', '#ff9800', '#9c27b0']
+        }]
+      }
+    });
+  </script>
+</body>
+</html>

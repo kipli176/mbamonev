@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard Global Anggaran</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-900">
+
+  <header class="bg-blue-900 text-white text-4xl font-bold text-center py-6 shadow">
+    📊 DASHBOARD GLOBAL ANGGARAN UNIVERSITAS
+  </header>
+
+  <main class="p-6 grid gap-6">
+
+    <!-- Ringkasan -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xl font-semibold">
+      <div class="bg-blue-100 text-blue-900 p-6 rounded-xl shadow text-center">
+        🔵 Total Pagu<br>Rp {{ "{:,.0f}".format(total_pagu).replace(",", ".") }}
+      </div>
+      <div class="bg-green-100 text-green-900 p-6 rounded-xl shadow text-center">
+        🟢 Realisasi<br>Rp {{ "{:,.0f}".format(total_realisasi).replace(",", ".") }}
+      </div>
+      <div class="bg-yellow-100 text-yellow-900 p-6 rounded-xl shadow text-center">
+        🟠 Capaian<br>{{ capaian }}%
+      </div>
+      <div class="bg-red-100 text-red-900 p-6 rounded-xl shadow text-center">
+        🔴 Sisa<br>Rp {{ "{:,.0f}".format(sisa).replace(",", ".") }}
+      </div>
+    </section>
+
+    <!-- Komposisi Jenis Dana -->
+    <section class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-2xl font-semibold mb-4">🍩 Komposisi Jenis Dana</h2>
+        <ul class="text-base list-disc pl-6">
+          {% set total_jenis = jenis_dana_agg | sum(attribute=1) %}
+          {% for nama, nilai in jenis_dana_agg %}
+          <li>{{ nama }}: {{ ((nilai / total_jenis) * 100) | round(1) }}%</li>
+          {% endfor %}
+        </ul>
+      </section>
+    <!-- Grafik Batang Pagu vs Realisasi per Unit -->
+    <section class="bg-white rounded-xl shadow p-6">
+      <h2 class="text-2xl font-semibold mb-4">📊 Pagu vs Realisasi per Unit</h2>
+      <canvas id="barChart" height="100" class="min-h-300"></canvas>
+    </section>
+    <section class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-2xl font-semibold mb-4">📋 Tabel Komposisi Jenis Dana</h2>
+        <div class="overflow-x-auto">
+          <table class="min-w-full border border-gray-300 text-sm md:text-base">
+            <thead class="bg-gray-200 text-gray-700">
+              <tr>
+                <th class="px-4 py-2 border">Jenis Dana</th>
+                <th class="px-4 py-2 border text-right">Jumlah (Rp)</th>
+                <th class="px-4 py-2 border text-right">Persentase</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% set total_jenis = jenis_dana_agg | sum(attribute=1) %}
+              {% for nama, nilai in jenis_dana_agg %}
+              <tr class="border-b">
+                <td class="px-4 py-2 border">{{ nama }}</td>
+                <td class="px-4 py-2 border text-right">Rp {{ "{:,.0f}".format(nilai).replace(",", ".") }}</td>
+                <td class="px-4 py-2 border text-right">{{ ((nilai / total_jenis) * 100) | round(1) }}%</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-2xl font-semibold mb-4">📋 Tabel Pagu vs Realisasi per Unit</h2>
+        <div class="overflow-x-auto">
+          <table class="min-w-full border border-gray-300 text-sm md:text-base">
+            <thead class="bg-gray-200 text-gray-700">
+              <tr>
+                <th class="px-4 py-2 border">Unit</th>
+                <th class="px-4 py-2 border text-right">Pagu (Rp)</th>
+                <th class="px-4 py-2 border text-right">Realisasi (Rp)</th>
+                <th class="px-4 py-2 border text-right">Capaian (%)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in grafik_per_unit %}
+              {% set cap = (row.realisasi / row.pagu * 100) if row.pagu > 0 else 0 %}
+              <tr class="{% if cap < 60 %}text-red-600 font-semibold{% endif %} border-b">
+                <td class="px-4 py-2 border">{{ row.nama_unit }}</td>
+                <td class="px-4 py-2 border text-right">Rp {{ "{:,.0f}".format(row.pagu).replace(",", ".") }}</td>
+                <td class="px-4 py-2 border text-right">Rp {{ "{:,.0f}".format(row.realisasi).replace(",", ".") }}</td>
+                <td class="px-4 py-2 border text-right">{{ cap | round(1) }}%</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+            
+
+  </main>
+
+  <!-- Chart.js Script -->
+  <script>
+    const barCtx = document.getElementById('barChart').getContext('2d');
+    new Chart(barCtx, {
+      type: 'bar',
+      data: {
+        labels: {{ grafik_per_unit | map(attribute='nama_unit') | list | tojson }},
+        datasets: [
+          {
+            label: 'Pagu',
+            data: {{ grafik_per_unit | map(attribute='pagu') | list | tojson }},
+            backgroundColor: 'rgba(59, 130, 246, 0.6)'  // biru
+          },
+          {
+            label: 'Realisasi',
+            data: {{ grafik_per_unit | map(attribute='realisasi') | list | tojson }},
+            backgroundColor: 'rgba(16, 185, 129, 0.6)'  // hijau
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'bottom' }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: value => 'Rp ' + value.toLocaleString('id-ID')
+            }
+          }
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>

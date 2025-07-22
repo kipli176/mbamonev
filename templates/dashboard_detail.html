@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>📋 Dashboard Realisasi Detail</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    html, body {
+      margin: 0; padding: 0;
+      height: 100%; background: #f5f5f5;
+      font-family: sans-serif; overflow: hidden;
+    }
+    .container {
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      height: 100vh; gap: 10px;
+      padding: 10px 20px; box-sizing: border-box;
+    }
+    .filters {
+      display: flex; gap: 10px; flex-wrap: wrap;
+    }
+    select, input {
+      padding: 6px; border-radius: 4px; font-size: 14px;
+      border: 1px solid #ccc;
+    }
+    .cards {
+      display: flex; gap: 10px; flex-wrap: wrap;
+    }
+    .card {
+      background: white; padding: 12px 16px;
+      border-radius: 8px; flex: 1;
+      min-width: 160px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    .charts {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 10px; 
+    }
+    .chart-box {
+      background: white; padding: 10px;
+      border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      max-height: 400px;
+    }
+    .table-container {
+      background: white; overflow: auto;
+      border-radius: 6px; height: 200px;
+    }
+    table {
+      width: 100%; border-collapse: collapse; font-size: 13px;
+    }
+    th, td {
+      padding: 8px; border-bottom: 1px solid #eee;
+    }
+    th { background: #f0f0f0; }
+    .actions { text-align: right; margin-top: 5px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- FILTERS -->
+    <div class="filters">
+      <select><option>2025</option></select>
+      <select><option>Jenis Dana</option><option>BOPTN</option><option>BLU</option></select>
+      <select><option>Unit</option><option>Q</option><option>H</option></select>
+      <select><option>Status</option><option>Selesai</option><option>Termin 1</option><option>Revisi</option></select>
+      <input type="text" placeholder="Cari uraian kegiatan...">
+    </div>
+
+    <!-- CARDS -->
+    <div class="cards">
+      <div class="card"><h4>Total Realisasi</h4><p>Rp 10.123.000.000</p></div>
+      <div class="card"><h4>Jumlah Transaksi</h4><p>186</p></div>
+      <div class="card"><h4>Transaksi Hari Ini</h4><p>4 entri</p></div>
+      <div class="card"><h4>Terakhir Diinput</h4><p>21 Juli 2025</p></div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="charts">
+      <div class="chart-box">
+        <h5>📈 Tren Realisasi per Hari</h5>
+        <canvas id="chartTime"></canvas>
+      </div>
+      <div class="chart-box">
+        <h5>📊 Status Realisasi</h5>
+        <canvas id="chartStatus"></canvas>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Unit</th>
+            <th>Kegiatan</th>
+            <th>Uraian</th>
+            <th>Status</th>
+            <th>Jumlah (Rp)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2025-07-21</td>
+            <td>Q / 01</td>
+            <td>7730</td>
+            <td>Perjalanan Dinas Workshop</td>
+            <td>Selesai</td>
+            <td>4.500.000</td>
+          </tr>
+          <tr>
+            <td>2025-07-20</td>
+            <td>H / 03</td>
+            <td>7729</td>
+            <td>Langganan Software Akreditasi</td>
+            <td>Termin 1</td>
+            <td>15.000.000</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="actions">
+      <button>⬇ Export Excel</button>
+    </div>
+  </div>
+
+  <script>
+    // Chart: Realisasi Time Series
+    new Chart(document.getElementById('chartTime'), {
+      type: 'line',
+      data: {
+        labels: ['15 Jul', '16 Jul', '17 Jul', '18 Jul', '19 Jul', '20 Jul', '21 Jul'],
+        datasets: [{
+          label: 'Jumlah Realisasi (Rp)',
+          data: [20000000, 15000000, 5000000, 30000000, 10000000, 25000000, 20000000],
+          backgroundColor: '#4caf50',
+          borderColor: '#4caf50',
+          fill: true,
+          tension: 0.3
+        }]
+      }
+    });
+
+    // Chart: Status Distribusi
+    new Chart(document.getElementById('chartStatus'), {
+      type: 'pie',
+      data: {
+        labels: ['Selesai', 'Termin 1', 'Revisi'],
+        datasets: [{
+          data: [120, 40, 26],
+          backgroundColor: ['#4caf50', '#ffc107', '#f44336']
+        }]
+      }
+    });
+  </script>
+</body>
+</html>

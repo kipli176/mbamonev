@@ -56,6 +56,35 @@ class Izin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nama_izin = db.Column(db.String(50), unique=True, nullable=False)
 
+class PaguRealisasi(db.Model):
+    __tablename__ = 'pagu_realisasi'
+
+    id = db.Column(db.Integer, primary_key=True)
+    id_tahun = db.Column(db.Integer, db.ForeignKey('tahun_anggaran.id_tahun'), nullable=False)
+
+    jenis = db.Column(db.String(10), nullable=False)
+    kode_unit = db.Column(db.String(5), nullable=False)
+    kode_subunit = db.Column(db.String(10), nullable=False)
+    kode_kegiatan = db.Column(db.String(10), nullable=False)
+    kode_keluaran = db.Column(db.String(10), nullable=False)
+    kode_output = db.Column(db.String(10), nullable=False)
+    kode_komponen = db.Column(db.String(10), nullable=False)
+    kode_subkomponen = db.Column(db.String(10), nullable=False)
+    kode_sap = db.Column(db.String(10))
+    kode_subsap = db.Column(db.String(10))
+    uraian = db.Column(db.Text)
+    jumlah = db.Column(db.Numeric)
+    jenis_data = db.Column(db.String(20))
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    tahun = db.relationship('TahunAnggaran', backref=db.backref('pagu_realisasi', lazy='dynamic'))
+
+class UnitKerja(db.Model):
+    __tablename__ = 'unit_kerja'
+
+    kode_unit = db.Column(db.String(10), primary_key=True)
+    nama_unit = db.Column(db.String(255), nullable=False)
+
 from extensions import login_manager
 @login_manager.user_loader
 def load_user(user_id):
